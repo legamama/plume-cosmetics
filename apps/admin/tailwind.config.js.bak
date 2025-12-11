@@ -1,0 +1,49 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+        "./index.html",
+        "./src/**/*.{js,ts,jsx,tsx}",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                // Plumé Brand Colors
+                plume: {
+                    rose: '#F8E8E8',
+                    'rose-dark': '#F0D4D4',
+                    coral: '#E8A598',
+                    'coral-dark': '#D68B7C',
+                    sage: '#8FB59A',
+                    'sage-dark': '#7AA087',
+                    amber: '#E8C598',
+                    'amber-dark': '#D6B07C',
+                },
+                // UI Colors
+                background: '#FAFAFA',
+                surface: '#FFFFFF',
+                'surface-hover': '#F5F5F5',
+                border: '#E5E5E5',
+                'border-dark': '#D4D4D4',
+                text: {
+                    primary: '#2D2D2D',
+                    secondary: '#6B6B6B',
+                    muted: '#9CA3AF',
+                },
+            },
+            fontFamily: {
+                sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            },
+            boxShadow: {
+                'soft': '0 2px 8px rgba(0, 0, 0, 0.04)',
+                'medium': '0 4px 12px rgba(0, 0, 0, 0.08)',
+            },
+            borderRadius: {
+                'xl': '1rem',
+                '2xl': '1.5rem',
+            },
+        },
+    },
+    plugins: [
+        require('@tailwindcss/typography'),
+    ],
+}

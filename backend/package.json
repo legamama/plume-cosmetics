@@ -1,0 +1,20 @@
+{
+  "name": "@plume/backend",
+  "version": "1.0.0",
+  "description": "Supabase backend architecture for the Plumé cosmetics platform",
+  "main": "lib/index.ts",
+  "keywords": [],
+  "author": "Plumé",
+  "license": "Private",
+  "type": "module",
+  "scripts": {
+    "generate-redirects": "tsx scripts/generate-redirects-from-supabase.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.87.0",
+    "@types/node": "^24.10.2",
+    "dotenv": "^17.2.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

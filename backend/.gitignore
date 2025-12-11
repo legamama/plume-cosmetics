@@ -1,0 +1,19 @@
+# Backend Library .gitignore
+
+# Dependencies
+node_modules/
+
+# Environment variables (NEVER commit these)
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
