@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Globe } from 'lucide-react';
 import { staticContentService, type StaticPage, type StaticPageTranslation } from '../../services/staticContentService';
+import { useToast } from '../../context/ToastContext';
 import { Button } from '../../components/ui/Button';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 
@@ -70,6 +71,8 @@ export function StaticPageEditorPage() {
         }
     }
 
+    const { success, error: toastError } = useToast();
+
     async function handleSave() {
         if (!id || !page) return;
 
@@ -83,10 +86,17 @@ export function StaticPageEditorPage() {
                 seo_og_image_url: translation.seo_og_image_url || '',
                 content: translation.content || {}
             });
-            alert('Saved successfully!');
-        } catch (error) {
+            success('Saved successfully!');
+        } catch (error: any) {
             console.error('Failed to save:', error);
-            alert('Failed to save changes.');
+            // Enhanced error logging to understand the failure
+            console.error('Error details:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
+            toastError(error.message || 'Failed to save changes.');
         } finally {
             setIsSaving(false);
         }
@@ -121,8 +131,8 @@ export function StaticPageEditorPage() {
                                 key={loc}
                                 onClick={() => setActiveLocale(loc)}
                                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${activeLocale === loc
-                                        ? 'bg-blue-50 text-blue-600'
-                                        : 'text-gray-600 hover:bg-gray-50'
+                                    ? 'bg-blue-50 text-blue-600'
+                                    : 'text-gray-600 hover:bg-gray-50'
                                     }`}
                             >
                                 {loc.toUpperCase()}

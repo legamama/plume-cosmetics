@@ -19,6 +19,9 @@ DROP POLICY IF EXISTS "Authenticated users can manage page sections" ON page_sec
 DROP POLICY IF EXISTS "Public can manage page sections" ON page_sections;
 
 -- 3. Create ULTIMATE PUBLIC POLICIES (Allow ALL access to EVERYONE for Dev)
+DROP POLICY IF EXISTS "Enable ALL access for page_definitions" ON page_definitions;
+DROP POLICY IF EXISTS "Enable ALL access for page_sections" ON page_sections;
+
 CREATE POLICY "Enable ALL access for page_definitions"
     ON page_definitions FOR ALL
     USING (true)
