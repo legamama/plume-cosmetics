@@ -47,28 +47,3 @@
   for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
-
-# Internationalization - automatic locale detection
-# Redirect to Korean for Korean-speaking visitors
-[[redirects]]
-  from = "/"
-  to = "/ko"
-  status = 302
-  force = false
-  conditions = {Language = ["ko"]}
-
-# Redirect to Vietnamese for Vietnamese-speaking visitors
-[[redirects]]
-  from = "/"
-  to = "/vi"
-  status = 302
-  force = false
-  conditions = {Language = ["vi"]}
-
-# Default to English
-[[redirects]]
-  from = "/"
-  to = "/en"
-  status = 302
-  force = false
-
