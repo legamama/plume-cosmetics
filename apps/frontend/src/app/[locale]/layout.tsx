@@ -1,12 +1,25 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { Inter, Outfit } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingActions } from "@/components/layout/FloatingActions";
 import { getSiteSettings, getFloatingActions } from "@/lib/site-settings";
 import type { Locale } from "@/i18n/config";
+
+const inter = Inter({
+    variable: "--font-inter",
+    subsets: ["latin", "vietnamese"],
+    display: "swap",
+});
+
+const outfit = Outfit({
+    variable: "--font-outfit",
+    subsets: ["latin"],
+    display: "swap",
+});
 
 type Props = {
     children: React.ReactNode;
@@ -58,16 +71,20 @@ export default async function LocaleLayout({ children, params }: Props) {
     const floatingActions = await getFloatingActions();
 
     return (
-        <NextIntlClientProvider messages={messages}>
-            <div className="flex min-h-screen flex-col">
-                <Header settings={siteSettings} />
-                <main className="flex-1">{children}</main>
-                <Footer settings={siteSettings} />
+        <html lang={locale} suppressHydrationWarning>
+            <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`} suppressHydrationWarning>
+                <NextIntlClientProvider messages={messages}>
+                    <div className="flex min-h-screen flex-col">
+                        <Header settings={siteSettings} />
+                        <main className="flex-1">{children}</main>
+                        <Footer settings={siteSettings} />
 
-                {/* Floating Action Buttons */}
-                <FloatingActions actions={floatingActions} />
-            </div>
-        </NextIntlClientProvider>
+                        {/* Floating Action Buttons */}
+                        <FloatingActions actions={floatingActions} />
+                    </div>
+                </NextIntlClientProvider>
+            </body>
+        </html>
     );
 }
 
