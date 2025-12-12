@@ -340,8 +340,8 @@ export default async function HomePage({ params }: Props) {
             <MarqueeSection text={marqueeText} />
 
             {/* TikTok Carousel - Admin-managed video feed (respects visibility setting) */}
-            {tiktokVisible && tiktokVideos.length > 0 && (
-                <TikTokCarousel videos={tiktokVideos} />
+            {tiktokVideos.length > 0 && (
+                <TikTokCarousel videos={tiktokVideos} visibility={tiktokVisible} />
             )}
 
             {/* Category Row */}

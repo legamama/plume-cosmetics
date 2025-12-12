@@ -174,9 +174,18 @@ export async function getSocialLinks(): Promise<SiteSettings['socials']> {
 }
 
 /**
+ * TikTok Section Visibility Configuration
+ */
+export interface TikTokVisibilityConfig {
+    mobile: boolean;
+    tablet: boolean;
+    desktop: boolean;
+}
+
+/**
  * Get TikTok section visibility setting
  */
-export async function getTikTokSectionVisibility(): Promise<boolean> {
+export async function getTikTokSectionVisibility(): Promise<TikTokVisibilityConfig> {
     try {
         const { data, error } = await supabase
             .from('site_settings')
@@ -186,12 +195,24 @@ export async function getTikTokSectionVisibility(): Promise<boolean> {
 
         if (error || !data) {
             // Default to visible if no setting exists
-            return true;
+            return { mobile: true, tablet: true, desktop: true };
         }
 
-        return data.value as boolean;
+        const value = data.value;
+
+        // Handle legacy boolean format
+        if (typeof value === 'boolean') {
+            return {
+                mobile: value,
+                tablet: value,
+                desktop: value
+            };
+        }
+
+        // Handle object format
+        return value as TikTokVisibilityConfig;
     } catch (error) {
         console.warn('Error fetching TikTok visibility, defaulting to visible:', error);
-        return true;
+        return { mobile: true, tablet: true, desktop: true };
     }
 }

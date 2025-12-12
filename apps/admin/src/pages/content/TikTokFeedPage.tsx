@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Reorder, useDragControls, motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, GripVertical, ExternalLink, Video, ToggleLeft, ToggleRight, Play, Eye, EyeOff } from 'lucide-react';
+import { Plus, Trash2, GripVertical, ExternalLink, Video, ToggleLeft, ToggleRight, Play, Eye } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { GlassPanel } from '@/components/ui/glass/GlassPanel';
@@ -9,7 +9,7 @@ import { GlassButton } from '@/components/ui/glass/GlassButton';
 import { GlassInput } from '@/components/ui/glass/GlassInput';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmDialog } from '@/context/ConfirmDialogContext';
-import { tiktokService, type TikTokVideo } from '@/services/tiktok';
+import { tiktokService, type TikTokVideo, type TikTokVisibilityConfig } from '@/services/tiktok';
 
 // Extract video ID and username from TikTok URL
 function parseTikTokUrl(url: string): { videoId: string | null; username: string | null } {
@@ -37,7 +37,11 @@ export function TikTokFeedPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isAdding, setIsAdding] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [sectionVisible, setSectionVisible] = useState(true);
+    const [visibilityConfig, setVisibilityConfig] = useState<TikTokVisibilityConfig>({
+        mobile: true,
+        tablet: true,
+        desktop: true
+    });
     const [isTogglingSection, setIsTogglingSection] = useState(false);
     const toast = useToast();
     const { confirm } = useConfirmDialog();
@@ -64,23 +68,23 @@ export function TikTokFeedPage() {
 
     async function loadSectionVisibility() {
         try {
-            const visible = await tiktokService.getSectionVisibility();
-            setSectionVisible(visible);
+            const config = await tiktokService.getSectionVisibility();
+            setVisibilityConfig(config);
         } catch (error) {
             console.error('Failed to load section visibility:', error);
         }
     }
 
-    async function handleToggleSectionVisibility() {
+    async function handleToggleVisibility(device: keyof TikTokVisibilityConfig) {
         try {
             setIsTogglingSection(true);
-            const newVisible = !sectionVisible;
-            await tiktokService.setSectionVisibility(newVisible);
-            setSectionVisible(newVisible);
-            toast.success(newVisible ? 'TikTok section is now visible' : 'TikTok section is now hidden');
+            const newConfig = { ...visibilityConfig, [device]: !visibilityConfig[device] };
+            await tiktokService.setSectionVisibility(newConfig);
+            setVisibilityConfig(newConfig);
+            toast.success(`TikTok feed is now ${newConfig[device] ? 'visible' : 'hidden'} on ${device}`);
         } catch (error) {
-            console.error('Failed to toggle section visibility:', error);
-            toast.error('Failed to update section visibility');
+            console.error('Failed to toggle visibility:', error);
+            toast.error('Failed to update visibility');
         } finally {
             setIsTogglingSection(false);
         }
@@ -152,7 +156,8 @@ export function TikTokFeedPage() {
         }
     };
 
-    const handleBulkToggle = async (enableAll: boolean) => {
+    async function handleBulkToggle(enableAll: boolean) {
+        // ... (implementation remains same)
         if (videos.length === 0) return;
 
         try {
@@ -173,45 +178,85 @@ export function TikTokFeedPage() {
 
     return (
         <div className="p-8 max-w-4xl mx-auto space-y-8">
-            {/* Section Visibility Toggle */}
+            {/* Section Visibility Toggles */}
             <GlassPanel className="p-5">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${sectionVisible
-                                ? 'bg-gradient-to-br from-green-100 to-emerald-100'
-                                : 'bg-gradient-to-br from-gray-100 to-gray-200'
-                            }`}>
-                            {sectionVisible ? (
-                                <Eye size={22} className="text-green-600" />
-                            ) : (
-                                <EyeOff size={22} className="text-gray-500" />
-                            )}
+                <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center">
+                            <Eye size={20} className="text-plume-rose" />
                         </div>
                         <div>
-                            <h3 className="font-medium text-gray-900">Section Visibility</h3>
+                            <h3 className="font-medium text-gray-900">Feed Visibility</h3>
                             <p className="text-sm text-gray-500">
-                                {sectionVisible
-                                    ? 'TikTok feed is visible on the landing page'
-                                    : 'TikTok feed is hidden from the landing page'}
+                                Control where the TikTok feed appears on your website.
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={handleToggleSectionVisibility}
-                        disabled={isTogglingSection}
-                        className={`
-                            relative inline-flex h-7 w-12 items-center rounded-full transition-colors
-                            ${sectionVisible ? 'bg-green-500' : 'bg-gray-300'}
-                            ${isTogglingSection ? 'opacity-50 cursor-wait' : 'cursor-pointer'}
-                        `}
-                    >
-                        <span
-                            className={`
-                                inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform
-                                ${sectionVisible ? 'translate-x-6' : 'translate-x-1'}
-                            `}
-                        />
-                    </button>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Mobile Toggle */}
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+                            <span className="text-sm font-medium text-gray-700">Mobile</span>
+                            <button
+                                onClick={() => handleToggleVisibility('mobile')}
+                                disabled={isTogglingSection}
+                                className={`
+                                    relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-plume-rose/50 focus:ring-offset-2
+                                    ${visibilityConfig.mobile ? 'bg-green-500' : 'bg-gray-300'}
+                                    ${isTogglingSection ? 'opacity-50 cursor-wait' : 'cursor-pointer'}
+                                `}
+                            >
+                                <span
+                                    className={`
+                                        inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform
+                                        ${visibilityConfig.mobile ? 'translate-x-6' : 'translate-x-1'}
+                                    `}
+                                />
+                            </button>
+                        </div>
+
+                        {/* Tablet Toggle */}
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+                            <span className="text-sm font-medium text-gray-700">Tablet</span>
+                            <button
+                                onClick={() => handleToggleVisibility('tablet')}
+                                disabled={isTogglingSection}
+                                className={`
+                                    relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-plume-rose/50 focus:ring-offset-2
+                                    ${visibilityConfig.tablet ? 'bg-green-500' : 'bg-gray-300'}
+                                    ${isTogglingSection ? 'opacity-50 cursor-wait' : 'cursor-pointer'}
+                                `}
+                            >
+                                <span
+                                    className={`
+                                        inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform
+                                        ${visibilityConfig.tablet ? 'translate-x-6' : 'translate-x-1'}
+                                    `}
+                                />
+                            </button>
+                        </div>
+
+                        {/* Desktop Toggle */}
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+                            <span className="text-sm font-medium text-gray-700">Desktop</span>
+                            <button
+                                onClick={() => handleToggleVisibility('desktop')}
+                                disabled={isTogglingSection}
+                                className={`
+                                    relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-plume-rose/50 focus:ring-offset-2
+                                    ${visibilityConfig.desktop ? 'bg-green-500' : 'bg-gray-300'}
+                                    ${isTogglingSection ? 'opacity-50 cursor-wait' : 'cursor-pointer'}
+                                `}
+                            >
+                                <span
+                                    className={`
+                                        inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform
+                                        ${visibilityConfig.desktop ? 'translate-x-6' : 'translate-x-1'}
+                                    `}
+                                />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </GlassPanel>
 

@@ -4,10 +4,12 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Play, Volume2, VolumeX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import type { TikTokVisibilityConfig } from '@/lib/site-settings';
 import type { TikTokVideo } from '@/lib/tiktok';
 
 interface TikTokCarouselProps {
     videos: TikTokVideo[];
+    visibility: TikTokVisibilityConfig;
 }
 
 // Extract TikTok video ID from URL
@@ -17,7 +19,7 @@ function extractTikTokVideoId(url: string): string | null {
     return match ? match[1] : null;
 }
 
-export function TikTokCarousel({ videos }: TikTokCarouselProps) {
+export function TikTokCarousel({ videos, visibility }: TikTokCarouselProps) {
     const t = useTranslations('home.tiktok');
     const [currentIndex, setCurrentIndex] = useState(0);
     const [activeVideoIndex, setActiveVideoIndex] = useState(0);
@@ -199,6 +201,18 @@ export function TikTokCarousel({ videos }: TikTokCarouselProps) {
         setIsMuted(prev => !prev);
     }, []);
 
+    // Calculate visibility classes
+    const visibilityClasses = `
+        ${visibility.mobile ? 'block' : 'hidden'}
+        ${visibility.tablet ? 'md:block' : 'md:hidden'}
+        ${visibility.desktop ? 'lg:block' : 'lg:hidden'}
+    `.trim();
+
+    // If completely hidden on all devices, return null (optimization)
+    if (!visibility.mobile && !visibility.tablet && !visibility.desktop) {
+        return null;
+    }
+
     if (!videos.length) {
         return null;
     }
@@ -206,10 +220,10 @@ export function TikTokCarousel({ videos }: TikTokCarouselProps) {
     return (
         <section
             ref={containerRef}
-            className="py-16 md:py-24 bg-gradient-to-b from-transparent via-plume-cream/20 to-transparent overflow-hidden"
+            className={`py-16 md:py-24 bg-gradient-to-b from-transparent via-plume-cream/20 to-transparent overflow-hidden w-full ${visibilityClasses}`}
             aria-label={t('title')}
         >
-            <div className="container mx-auto px-4">
+            <div className="container mx-auto px-4 w-full max-w-full overflow-hidden">
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

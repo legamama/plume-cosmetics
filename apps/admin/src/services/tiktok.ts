@@ -8,6 +8,12 @@ export interface TikTokVideo {
     created_at: string;
 }
 
+export interface TikTokVisibilityConfig {
+    mobile: boolean; // < 768px
+    tablet: boolean; // 768px - 1024px
+    desktop: boolean; // >= 1024px
+}
+
 export const tiktokService = {
     async getAll() {
         const { data, error } = await supabase
@@ -76,7 +82,7 @@ export const tiktokService = {
         if (error) throw error;
     },
 
-    async getSectionVisibility(): Promise<boolean> {
+    async getSectionVisibility(): Promise<TikTokVisibilityConfig> {
         const { data, error } = await supabase
             .from('site_settings')
             .select('value')
@@ -85,18 +91,29 @@ export const tiktokService = {
 
         if (error || !data) {
             // Default to visible if no setting exists
-            return true;
+            return { mobile: true, tablet: true, desktop: true };
         }
 
-        return data.value as boolean;
+        const value = data.value;
+
+        // Handle legacy boolean format
+        if (typeof value === 'boolean') {
+            return {
+                mobile: value,
+                tablet: value,
+                desktop: value
+            };
+        }
+
+        return value as TikTokVisibilityConfig;
     },
 
-    async setSectionVisibility(visible: boolean): Promise<void> {
+    async setSectionVisibility(config: TikTokVisibilityConfig): Promise<void> {
         const { error } = await supabase
             .from('site_settings')
             .upsert({
                 setting_key: 'tiktok_section_visible',
-                value: visible,
+                value: config,
                 updated_at: new Date().toISOString()
             }, {
                 onConflict: 'setting_key'
