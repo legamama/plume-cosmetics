@@ -44,9 +44,9 @@ export async function generateMetadata({ params }: Props) {
             type: "website",
         },
         alternates: {
-            canonical: locale === "vi" ? "/" : `/${locale}`,
+            canonical: `/${locale}`,
             languages: {
-                vi: "/",
+                vi: "/vi",
                 en: "/en",
                 ko: "/ko",
             },

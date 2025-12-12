@@ -9,13 +9,6 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Redirects for trailing slash normalization
-[[redirects]]
-  from = "/*/"
-  to = "/:splat"
-  status = 301
-  force = false
-
 # Headers for security and caching
 [[headers]]
   for = "/*"
