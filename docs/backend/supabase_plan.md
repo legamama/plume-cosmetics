@@ -3,7 +3,7 @@
 > **Status**: Awaiting Approval  
 > **Last Updated**: 2025-12-09
 
-This document outlines the Supabase backend architecture for Plumé, a modern cosmetics brand website. The schema supports products, blog posts, multilingual content (Vietnamese, English, Korean), media management via Bunny CDN, and external e-commerce links.
+This document outlines the Supabase backend architecture for Plumé, a modern cosmetics brand website. The schema supports products, blog posts, multilingual content (Vietnamese, English, Korean), media management via Supabase Storage, and external e-commerce links.
 
 ---
 
@@ -45,13 +45,13 @@ erDiagram
 | `product_categories` | Product category hierarchy |
 | `products` | Base product data (non-translatable) |
 | `product_translations` | Locale-specific product content + SEO |
-| `product_media` | Product images/videos (Bunny CDN URLs) |
+| `product_media` | Product images/videos (Supabase Storage URLs) |
 | `product_external_links` | E-commerce platform links |
 | `product_feedbacks` | Admin-curated customer testimonials per product |
 | `product_feedback_translations` | Locale-specific feedback content |
 | `blog_posts` | Base blog post data |
 | `blog_translations` | Locale-specific blog content + SEO |
-| `blog_media` | Blog images/videos (Bunny CDN URLs) |
+| `blog_media` | Blog images/videos (Supabase Storage URLs) |
 | `page_definitions` | Page builder: page routing, SEO, and metadata |
 | `page_sections` | Page builder: dynamic content blocks with JSONB config |
 | `navigation_items` | Site navigation structure |
@@ -189,7 +189,7 @@ CREATE TABLE product_media (
     product_id    UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     
     -- Media details
-    url           TEXT NOT NULL,                  -- Bunny CDN URL
+    url           TEXT NOT NULL,                  -- Supabase Storage URL
     alt_text      VARCHAR(200),                   -- Accessibility
     type          VARCHAR(20) DEFAULT 'image',    -- 'image', 'video'
     is_primary    BOOLEAN DEFAULT FALSE,          -- Main product image
@@ -366,7 +366,7 @@ CREATE INDEX idx_blog_media_post ON blog_media(blog_post_id);
 ---
 
 ### 10. `media_assets` - Centralized Media Library
-**Storage Strategy**: Binary files stored in Bunny Storage. This table stores metadata and the public CDN URL.
+**Storage Strategy**: Binary files stored in Supabase Storage. This table stores metadata and the public URL.
 
 ```sql
 CREATE TABLE media_folders (
@@ -386,9 +386,9 @@ CREATE TABLE media_assets (
     width           INTEGER,                        -- For images
     height          INTEGER,                        -- For images
     
-    -- Bunny Integration
-    bunny_path      TEXT NOT NULL,                  -- Storage path (e.g. '/2024/01/image.jpg')
-    bunny_cdn_url   TEXT NOT NULL,                  -- Full public URL
+    -- Supabase Storage Integration
+    storage_path    TEXT NOT NULL,                  -- Storage path (e.g. 'folder/file.jpg')
+    public_url      TEXT NOT NULL,                  -- Full public URL
     
     -- Organization
     folder_id       UUID REFERENCES media_folders(id) ON DELETE SET NULL,

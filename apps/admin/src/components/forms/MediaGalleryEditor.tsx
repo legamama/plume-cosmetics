@@ -21,7 +21,7 @@ export function MediaGalleryEditor({ value, onChange }: MediaGalleryEditorProps)
     const handleAddImage = (asset: any) => {
         const newItem: MediaItem = {
             id: crypto.randomUUID(),
-            url: asset.bunny_cdn_url,
+            url: asset.public_url,
             alt_text_vi: asset.alt_text || '',
             sort_order: value.length,
             is_carousel: false,

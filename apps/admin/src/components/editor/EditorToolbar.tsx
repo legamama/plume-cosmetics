@@ -85,9 +85,9 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     };
 
     const handleInsertImage = (asset: any) => {
-        if (asset.bunny_cdn_url) {
+        if (asset.public_url) {
             editor.chain().focus().setImage({
-                src: asset.bunny_cdn_url,
+                src: asset.public_url,
                 alt: asset.alt_text || ''
             }).run();
         }

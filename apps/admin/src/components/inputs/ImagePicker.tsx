@@ -66,7 +66,7 @@ export function ImagePicker({ label, value, onChange, error }: ImagePickerProps)
             <MediaLibraryModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSelect={(asset) => onChange(asset.bunny_cdn_url)}
+                onSelect={(asset) => onChange(asset.public_url)}
             />
         </div>
     );

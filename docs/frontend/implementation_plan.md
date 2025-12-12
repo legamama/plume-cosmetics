@@ -233,7 +233,7 @@ PLASMIC.registerComponent(HeroPrimary, {
 - `products`: Product catalog with translations
 - `blog_posts`: Blog articles with translations
 - `page_sections`: Dynamic sections for About and other pages
-- `media_assets`: Media library for Bunny CDN URLs
+- `media_assets`: Media library for Supabase Storage URLs
 - `redirects`: URL redirect rules
 
 ### Plasmic (Visual Content)

@@ -12,7 +12,7 @@ export interface BlogPost {
     title: LocalizedContent;
     excerpt: LocalizedContent;
     content: LocalizedContent; // HTML from TipTap
-    coverImage: string; // Bunny CDN URL
+    coverImage: string; // Storage URL
     author: Author;
     publishedAt: string;
     category: BlogCategory;

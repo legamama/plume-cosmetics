@@ -19,18 +19,7 @@ export function isValidUrl(url: string): boolean {
     }
 }
 
-/**
- * Check if a string is a valid Bunny CDN URL
- */
-export function isBunnyCdnUrl(url: string): boolean {
-    if (!isValidUrl(url)) return false;
-    try {
-        const parsed = new URL(url);
-        return parsed.hostname.endsWith('.b-cdn.net');
-    } catch {
-        return false;
-    }
-}
+
 
 /**
  * Check if a string is a valid slug

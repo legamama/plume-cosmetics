@@ -13,13 +13,12 @@ function getSupabaseClient() {
     return createClient(url, key);
 }
 
-const BUNNY_STORAGE_API_KEY = process.env.BUNNY_STORAGE_API_KEY;
-const BUNNY_STORAGE_ZONE_NAME = process.env.BUNNY_STORAGE_ZONE_NAME;
-
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    context: { params: Promise<{ id: string }> } // Fix type signature to Promise
 ) {
+    const params = await context.params;
+
     // CORS Headers
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -29,7 +28,7 @@ export async function DELETE(
 
     try {
         const supabase = getSupabaseClient();
-        const { id } = await params;
+        const { id } = params;
 
         // 1. Auth Check
         const authHeader = req.headers.get('Authorization');
@@ -43,10 +42,13 @@ export async function DELETE(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers });
         }
 
-        // 2. Get Asset Metadata to find Bunny Path
+        // 2. Get Asset Metadata to find Storage Path
+        // We select both old and new columns to handle migration period if needed, 
+        // but since we are migrating, we expect storage_path. 
+        // Ideally we should handle if 'storage_path' is missing (old record).
         const { data: asset, error: fetchError } = await supabase
             .from('media_assets')
-            .select('bunny_path')
+            .select('storage_path, bunny_path')
             .eq('id', id)
             .single();
 
@@ -54,29 +56,30 @@ export async function DELETE(
             return NextResponse.json({ error: 'Asset not found' }, { status: 404, headers });
         }
 
-        // 3. Delete from Bunny Storage
-        if (!BUNNY_STORAGE_API_KEY || !BUNNY_STORAGE_ZONE_NAME) {
-            console.error('Missing Bunny credentials');
-            return NextResponse.json({ error: 'Server configuration error' }, { status: 500, headers });
+        // Determine path: use storage_path if available, else try bunny_path (migration safety)
+        const pathToDelete = asset.storage_path || asset.bunny_path;
+
+        if (!pathToDelete) {
+            // Just delete the DB record if no file path found (maybe already gone)
+            console.warn('No storage path found for asset', id);
+        } else {
+            // 3. Delete from Supabase Storage
+            // Even if it was a Bunny Path (e.g. /foo.jpg), Supabase Storage might handle it 
+            // if we migrated files to the same paths. If files are still in Bunny, we can't delete them from here without Bunny keys.
+            // Assumption: We only delete files from Supabase Storage now. 
+            // If the file is physically in Bunny, we can't delete it. We just delete the DB record.
+
+            const { error: storageError } = await supabase.storage
+                .from('media')
+                .remove([pathToDelete]);
+
+            if (storageError) {
+                console.error('Supabase Storage Delete Error:', storageError);
+                // We might validly fail if file doesn't exist. We continue to delete DB record.
+            }
         }
 
-        const deleteUrl = `https://storage.bunnycdn.com/${BUNNY_STORAGE_ZONE_NAME}${asset.bunny_path}`;
-
-        const bunnyResponse = await fetch(deleteUrl, {
-            method: 'DELETE',
-            headers: {
-                'AccessKey': BUNNY_STORAGE_API_KEY,
-            },
-        });
-
-        if (!bunnyResponse.ok && bunnyResponse.status !== 404) {
-            // If 404, file might already be gone, so we proceed to clean DB
-            const errorText = await bunnyResponse.text();
-            console.error('Bunny Delete Error:', errorText);
-            return NextResponse.json({ error: 'Failed to delete from storage provider' }, { status: 502, headers });
-        }
-
-        // 4. Delete from Supabase
+        // 4. Delete from Supabase DB
         const { error: deleteError } = await supabase
             .from('media_assets')
             .delete()

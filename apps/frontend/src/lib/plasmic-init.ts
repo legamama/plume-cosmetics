@@ -66,7 +66,7 @@ PLASMIC.registerComponent(PlasmicHero, {
         },
         imageUrl: {
             type: "string",
-            description: "Hero image URL (Bunny CDN)",
+            description: "Hero image URL (Supabase Storage)",
         },
         imageAlt: {
             type: "string",

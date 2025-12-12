@@ -13,13 +13,13 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: process.env.BUNNY_CDN_HOST || "plume.b-cdn.net",
+        hostname: "images.unsplash.com",
         pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
-        pathname: "/**",
+        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname : "supabase.co",
+        pathname: "/storage/v1/object/public/**",
       },
       {
         protocol: "https",

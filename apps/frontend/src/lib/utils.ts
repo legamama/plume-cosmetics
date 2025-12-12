@@ -45,7 +45,3 @@ export function slugify(text: string): string {
         .replace(/(^-|-$)+/g, "");
 }
 
-export function generateBunnyUrl(path: string): string {
-    const host = process.env.BUNNY_CDN_HOST || "plume.b-cdn.net";
-    return `https://${host}/${path}`;
-}

@@ -57,7 +57,7 @@ export function MediaGrid({
                         }}
                     >
                         <img
-                            src={asset.bunny_cdn_url}
+                            src={asset.public_url}
                             alt={asset.alt_text || asset.filename}
                             className="w-full h-full object-cover"
                             loading="lazy"

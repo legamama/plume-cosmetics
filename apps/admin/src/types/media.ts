@@ -14,8 +14,8 @@ export interface MediaAsset {
     size_bytes: number | null;
     width: number | null;
     height: number | null;
-    bunny_path: string;
-    bunny_cdn_url: string;
+    storage_path: string;
+    public_url: string;
     folder_id: string | null;
     alt_text: string | null;
     credits: string | null;

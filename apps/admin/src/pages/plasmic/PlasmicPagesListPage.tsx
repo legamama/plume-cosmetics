@@ -170,7 +170,7 @@ export function PlasmicPagesListPage() {
                             <ul className="list-disc list-inside space-y-1 text-purple-700">
                                 <li>Products and pricing</li>
                                 <li>Blog posts and articles</li>
-                                <li>Media library (Bunny CDN)</li>
+                                <li>Media library (Supabase Storage)</li>
                                 <li>Redirects and structured data</li>
                             </ul>
                         </div>

@@ -71,7 +71,7 @@ export function MediaEditModal({ isOpen, onClose, asset, onSave }: MediaEditModa
                 <div className="p-4 bg-gray-50 border-b">
                     <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden max-w-[200px] mx-auto">
                         <img
-                            src={asset.bunny_cdn_url}
+                            src={asset.public_url}
                             alt={asset.filename}
                             className="w-full h-full object-contain"
                         />

@@ -13,10 +13,6 @@ function getSupabaseClient() {
     return createClient(url, key);
 }
 
-const BUNNY_STORAGE_API_KEY = process.env.BUNNY_STORAGE_API_KEY;
-const BUNNY_STORAGE_ZONE_NAME = process.env.BUNNY_STORAGE_ZONE_NAME;
-const BUNNY_PULL_ZONE_URL = process.env.BUNNY_PULL_ZONE_URL;
-
 export async function POST(req: NextRequest) {
     // CORS Headers for Admin App
     const headers = {
@@ -61,55 +57,50 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400, headers });
         }
 
-        // 3. Upload to Bunny Storage
-        if (!BUNNY_STORAGE_API_KEY || !BUNNY_STORAGE_ZONE_NAME || !BUNNY_PULL_ZONE_URL) {
-            console.error('Missing Bunny credentials');
-            return NextResponse.json({ error: 'Server configuration error' }, { status: 500, headers });
-        }
-
+        // 3. Upload to Supabase Storage
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
         // Generate unique filename to prevent collisions
         const timestamp = Date.now();
-        const uniqueFilename = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-        const storagePath = `/${uniqueFilename}`;
+        const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const uniqueFilename = `${timestamp}-${cleanName}`;
+        // Can organize by folder if folderId is provided, but user schema just had bunny_path. 
+        // We will stick to a flat structure or date-based if preferred, but simpler is flat for now.
+        // Actually, let's just put it in root or a 'uploads' folder. The previous bunny path was `/${uniqueFilename}`.
+        const storagePath = `${uniqueFilename}`;
 
-        // Bunny Storage API URL
-        const storageHostname = process.env.BUNNY_STORAGE_HOSTNAME || 'storage.bunnycdn.com';
-        const uploadUrl = `https://${storageHostname}/${BUNNY_STORAGE_ZONE_NAME}${storagePath}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('media')
+            .upload(storagePath, buffer, {
+                contentType: file.type || 'application/octet-stream',
+                upsert: false
+            });
 
-        const bunnyResponse = await fetch(uploadUrl, {
-            method: 'PUT',
-            headers: {
-                'AccessKey': BUNNY_STORAGE_API_KEY,
-                'Content-Type': 'application/octet-stream',
-            },
-            body: buffer,
-        });
-
-        if (!bunnyResponse.ok) {
-            const errorText = await bunnyResponse.text();
-            console.error('Bunny Upload Error:', bunnyResponse.status, bunnyResponse.statusText, errorText);
-            console.error('Upload URL was:', uploadUrl);
+        if (uploadError) {
+            console.error('Supabase Storage Upload Error:', uploadError);
             return NextResponse.json({
                 error: 'Failed to upload to storage provider',
-                details: `${bunnyResponse.status}: ${errorText}`
+                details: uploadError.message
             }, { status: 502, headers });
         }
 
+        const { data: { publicUrl } } = supabase.storage
+            .from('media')
+            .getPublicUrl(storagePath);
+
         // 4. Save Metadata to Supabase
-        const cdnUrl = `${BUNNY_PULL_ZONE_URL}${storagePath}`;
         const mimeType = file.type || 'application/octet-stream';
 
+        // NOTE: We use new column names 'storage_path' and 'public_url'
         const { data: asset, error: dbError } = await supabase
             .from('media_assets')
             .insert({
                 filename: uniqueFilename,
                 mime_type: mimeType,
                 size_bytes: file.size,
-                bunny_path: storagePath,
-                bunny_cdn_url: cdnUrl,
+                storage_path: storagePath,  // Was bunny_path
+                public_url: publicUrl,      // Was bunny_cdn_url
                 folder_id: folderId || null,
                 alt_text: altText || null,
                 uploaded_by: user.id
@@ -119,6 +110,8 @@ export async function POST(req: NextRequest) {
 
         if (dbError) {
             console.error('Supabase DB Error:', dbError);
+            // Try to cleanup storage if DB fails
+            await supabase.storage.from('media').remove([storagePath]);
             return NextResponse.json({ error: 'Failed to save metadata' }, { status: 500, headers });
         }
 

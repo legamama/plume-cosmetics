@@ -27,7 +27,7 @@ export interface Product {
     price: LocalizedField<number>;
     compareAtPrice?: LocalizedField<number>;
     currency: string;
-    images: string[]; // Bunny CDN URLs
+    images: string[]; // Storage URLs
     thumbnail: string;
     primaryImage?: string; // Explicit primary image
     secondaryImage?: string; // Explicit hover image

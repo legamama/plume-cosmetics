@@ -65,7 +65,7 @@ export function MediaViewerModal({
 
     const handleCopyLink = async () => {
         try {
-            await navigator.clipboard.writeText(currentAsset.bunny_cdn_url);
+            await navigator.clipboard.writeText(currentAsset.public_url);
             setCopied(true);
             toast.success('Link copied to clipboard!');
             setTimeout(() => setCopied(false), 2000);
@@ -147,13 +147,13 @@ export function MediaViewerModal({
             <div className="flex-1 flex items-center justify-center p-8">
                 {isVideo ? (
                     <video
-                        src={currentAsset.bunny_cdn_url}
+                        src={currentAsset.public_url}
                         controls
                         className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
                     />
                 ) : (
                     <img
-                        src={currentAsset.bunny_cdn_url}
+                        src={currentAsset.public_url}
                         alt={currentAsset.alt_text || currentAsset.filename}
                         className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
                     />
@@ -167,7 +167,7 @@ export function MediaViewerModal({
                 {/* Thumbnail */}
                 <div className="aspect-video bg-black/30 rounded-lg overflow-hidden mb-6">
                     <img
-                        src={currentAsset.bunny_cdn_url}
+                        src={currentAsset.public_url}
                         alt={currentAsset.filename}
                         className="w-full h-full object-contain"
                     />
@@ -225,7 +225,7 @@ export function MediaViewerModal({
                         <div className="mt-2 flex gap-2">
                             <input
                                 type="text"
-                                value={currentAsset.bunny_cdn_url}
+                                value={currentAsset.public_url}
                                 readOnly
                                 className="flex-1 bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white/80 truncate"
                             />
@@ -239,7 +239,7 @@ export function MediaViewerModal({
                                 {copied ? <Check size={16} /> : <Copy size={16} />}
                             </button>
                             <a
-                                href={currentAsset.bunny_cdn_url}
+                                href={currentAsset.public_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded transition-colors"
