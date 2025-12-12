@@ -27,3 +27,14 @@ export interface MediaAsset {
 export interface MediaUploadResponse {
     asset: MediaAsset;
 }
+
+export interface StorageBucketUsage {
+    name: string;
+    size_bytes: number;
+}
+
+export interface StorageUsage {
+    total_bytes: number;
+    limit_bytes: number;
+    buckets: StorageBucketUsage[];
+}

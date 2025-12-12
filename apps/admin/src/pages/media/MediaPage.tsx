@@ -9,6 +9,7 @@ import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { RefreshCw } from 'lucide-react';
 import type { MediaAsset } from '../../types/media';
+import { StorageUsagePanel } from '../../components/media/StorageUsagePanel';
 
 export function MediaPage() {
     const { media, fetchMedia, isLoading, deleteMedia, updateMedia } = useMedia();
@@ -70,35 +71,43 @@ export function MediaPage() {
                 </Button>
             </div>
 
-            <Card>
-                <div className="p-4 space-y-6">
-                    {/* Inline Upload Area */}
-                    <MediaUploader
-                        compact
-                        onUploadComplete={() => {
-                            fetchMedia();
-                        }}
-                    />
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-3">
+                    <Card>
+                        <div className="p-4 space-y-6">
+                            {/* Inline Upload Area */}
+                            <MediaUploader
+                                compact
+                                onUploadComplete={() => {
+                                    fetchMedia();
+                                }}
+                            />
 
-                    {/* Media Grid */}
-                    {isLoading && media.length === 0 ? (
-                        <div className="flex justify-center p-12">
-                            <div className="w-8 h-8 border-4 border-plume-coral border-t-transparent rounded-full animate-spin"></div>
+                            {/* Media Grid */}
+                            {isLoading && media.length === 0 ? (
+                                <div className="flex justify-center p-12">
+                                    <div className="w-8 h-8 border-4 border-plume-coral border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                            ) : media.length === 0 ? (
+                                <div className="text-center py-20 text-text-muted">
+                                    <p>No media found. Upload your first file above!</p>
+                                </div>
+                            ) : (
+                                <MediaGrid
+                                    assets={media}
+                                    onView={handleView}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
+                                />
+                            )}
                         </div>
-                    ) : media.length === 0 ? (
-                        <div className="text-center py-20 text-text-muted">
-                            <p>No media found. Upload your first file above!</p>
-                        </div>
-                    ) : (
-                        <MediaGrid
-                            assets={media}
-                            onView={handleView}
-                            onEdit={handleEdit}
-                            onDelete={handleDelete}
-                        />
-                    )}
+                    </Card>
                 </div>
-            </Card>
+
+                <div className="space-y-6">
+                    <StorageUsagePanel />
+                </div>
+            </div>
 
             {/* Viewer Modal */}
             <MediaViewerModal
