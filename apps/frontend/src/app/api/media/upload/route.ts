@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase Client (Service Role for writing to DB)
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Create Supabase client lazily inside handlers to avoid build-time errors
+function getSupabaseClient() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!url || !key) {
+        throw new Error('Missing Supabase configuration');
+    }
+
+    return createClient(url, key);
+}
 
 const BUNNY_STORAGE_API_KEY = process.env.BUNNY_STORAGE_API_KEY;
-const BUNNY_STORAGE_ZONE_NAME = process.env.BUNNY_STORAGE_ZONE_NAME; // e.g. "plume-storage"
-const BUNNY_PULL_ZONE_URL = process.env.BUNNY_PULL_ZONE_URL; // e.g. "https://cdn.plume.vn"
+const BUNNY_STORAGE_ZONE_NAME = process.env.BUNNY_STORAGE_ZONE_NAME;
+const BUNNY_PULL_ZONE_URL = process.env.BUNNY_PULL_ZONE_URL;
 
 export async function POST(req: NextRequest) {
     // CORS Headers for Admin App
     const headers = {
-        'Access-Control-Allow-Origin': '*', // In prod, restrict to Admin URL
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };
@@ -24,6 +30,8 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+        const supabase = getSupabaseClient();
+
         // 1. Authorization Check (Simple check for now, ideally verify JWT)
         const authHeader = req.headers.get('Authorization');
         if (!authHeader) {
@@ -42,10 +50,6 @@ export async function POST(req: NextRequest) {
         }
 
         console.log('User verified:', user.id);
-
-        // Check if user is admin (optional, depending on RLS/Claims)
-        // For now, assume any authenticated user with the token can upload if they are in the auth system
-        // Real implementation should check roles.
 
         // 2. Parse FormData
         const formData = await req.formData();
@@ -69,10 +73,9 @@ export async function POST(req: NextRequest) {
         // Generate unique filename to prevent collisions
         const timestamp = Date.now();
         const uniqueFilename = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-        const storagePath = `/${uniqueFilename}`; // Root level for now, or use folder logic
+        const storagePath = `/${uniqueFilename}`;
 
         // Bunny Storage API URL
-        // Endpoints vary by region - use BUNNY_STORAGE_HOSTNAME from env
         const storageHostname = process.env.BUNNY_STORAGE_HOSTNAME || 'storage.bunnycdn.com';
         const uploadUrl = `https://${storageHostname}/${BUNNY_STORAGE_ZONE_NAME}${storagePath}`;
 
@@ -80,7 +83,7 @@ export async function POST(req: NextRequest) {
             method: 'PUT',
             headers: {
                 'AccessKey': BUNNY_STORAGE_API_KEY,
-                'Content-Type': 'application/octet-stream', // Bunny expects raw bytes
+                'Content-Type': 'application/octet-stream',
             },
             body: buffer,
         });
@@ -97,16 +100,12 @@ export async function POST(req: NextRequest) {
 
         // 4. Save Metadata to Supabase
         const cdnUrl = `${BUNNY_PULL_ZONE_URL}${storagePath}`;
-
-        // Simple MIME type detection (trusting client for now or use library)
         const mimeType = file.type || 'application/octet-stream';
-
-        // Get image dimensions (optional, requires sharp or similar if we strictly need it, skipping for now)
 
         const { data: asset, error: dbError } = await supabase
             .from('media_assets')
             .insert({
-                filename: uniqueFilename, // Storing unique name
+                filename: uniqueFilename,
                 mime_type: mimeType,
                 size_bytes: file.size,
                 bunny_path: storagePath,
@@ -120,7 +119,6 @@ export async function POST(req: NextRequest) {
 
         if (dbError) {
             console.error('Supabase DB Error:', dbError);
-            // Attempt cleanup from Bunny?
             return NextResponse.json({ error: 'Failed to save metadata' }, { status: 500, headers });
         }
 
