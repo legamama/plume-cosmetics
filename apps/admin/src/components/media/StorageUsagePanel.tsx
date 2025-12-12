@@ -13,6 +13,7 @@ function formatBytes(bytes: number): string {
 }
 
 export function StorageUsagePanel() {
+    // Component to display storage usage metrics
     const [usage, setUsage] = useState<StorageUsage | null>(null);
     const [loading, setLoading] = useState(true);
 
