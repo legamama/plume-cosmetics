@@ -1,5 +1,7 @@
 
 import { setRequestLocale, getTranslations } from "next-intl/server";
+
+export const revalidate = 60;
 import { HeroPrimary } from "@/components/sections/HeroPrimary";
 import { BrandStory, type StoryFeature } from "@/components/sections/BrandStory";
 import { CTABanner } from "@/components/sections/CTABanner";

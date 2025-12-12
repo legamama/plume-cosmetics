@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, useInView, PanInfo } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Play, Volume2, VolumeX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { TikTokVideo } from '@/lib/tiktok';
@@ -24,8 +24,14 @@ export function TikTokCarousel({ videos }: TikTokCarouselProps) {
     const [isMuted, setIsMuted] = useState(true);
     const [isDragging, setIsDragging] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
-    const iframeRefs = useRef<Map<number, HTMLIFrameElement>>(new Map());
+    const carouselRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(containerRef, { once: true, margin: '-100px' });
+
+    // Touch handling refs for reliable mobile swipe
+    const touchStartX = useRef(0);
+    const touchStartY = useRef(0);
+    const touchEndX = useRef(0);
+    const isSwiping = useRef(false);
 
     // Calculate visible items based on screen size
     const [itemsPerView, setItemsPerView] = useState(1);
@@ -87,15 +93,47 @@ export function TikTokCarousel({ videos }: TikTokCarouselProps) {
         setActiveVideoIndex(getCenterVideoIndex(index));
     }, [getCenterVideoIndex]);
 
-    // Handle swipe gestures - navigation functions already set center video as active
-    const handleDragEnd = useCallback((_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-        setIsDragging(false);
-        const threshold = 50;
-        if (info.offset.x < -threshold && currentIndex < maxIndex) {
-            goNext(); // This will also set center video as active
-        } else if (info.offset.x > threshold && currentIndex > 0) {
-            goPrev(); // This will also set center video as active
+    // Touch event handlers for reliable mobile swipe
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+        touchStartY.current = e.touches[0].clientY;
+        touchEndX.current = e.touches[0].clientX;
+        isSwiping.current = false;
+        setIsDragging(true);
+    }, []);
+
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
+        touchEndX.current = e.touches[0].clientX;
+        const deltaX = Math.abs(touchEndX.current - touchStartX.current);
+        const deltaY = Math.abs(e.touches[0].clientY - touchStartY.current);
+
+        // If horizontal movement is greater, prevent vertical scroll and mark as swiping
+        if (deltaX > deltaY && deltaX > 10) {
+            isSwiping.current = true;
+            // Only prevent default if we're primarily swiping horizontally
+            if (deltaX > 30) {
+                e.preventDefault();
+            }
         }
+    }, []);
+
+    const handleTouchEnd = useCallback(() => {
+        setIsDragging(false);
+
+        if (!isSwiping.current) return;
+
+        const diff = touchStartX.current - touchEndX.current;
+        const threshold = 50;
+
+        if (diff > threshold && currentIndex < maxIndex) {
+            // Swiped left - go next
+            goNext();
+        } else if (diff < -threshold && currentIndex > 0) {
+            // Swiped right - go prev
+            goPrev();
+        }
+
+        isSwiping.current = false;
     }, [currentIndex, maxIndex, goNext, goPrev]);
 
     // Handle video click to play
@@ -253,20 +291,19 @@ export function TikTokCarousel({ videos }: TikTokCarouselProps) {
                         />
                     )}
 
-                    {/* Video container with swipe support */}
-                    <motion.div
-                        className="overflow-hidden mx-4 md:mx-8 cursor-grab active:cursor-grabbing"
-                        onPanStart={() => setIsDragging(true)}
+                    {/* Video container with swipe support - using native touch handlers for reliable mobile swipe */}
+                    <div
+                        ref={carouselRef}
+                        className="overflow-hidden mx-4 md:mx-8 touch-pan-y"
+                        style={{ touchAction: 'pan-y' }}
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                     >
                         <motion.div
                             className="flex gap-4 md:gap-6"
                             animate={{ x: `-${currentIndex * (100 / itemsPerView)}%` }}
                             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            drag="x"
-                            dragConstraints={{ left: 0, right: 0 }}
-                            dragElastic={0.1}
-                            onDragEnd={handleDragEnd}
-                            style={{ touchAction: 'pan-y' }}
                         >
                             {videos.map((video, index) => {
                                 const videoId = extractTikTokVideoId(video.url);
@@ -294,10 +331,6 @@ export function TikTokCarousel({ videos }: TikTokCarouselProps) {
                                         >
                                             {videoId ? (
                                                 <TikTokPlayerEmbed
-                                                    ref={(el) => {
-                                                        if (el) iframeRefs.current.set(index, el);
-                                                        else iframeRefs.current.delete(index);
-                                                    }}
                                                     videoId={videoId}
                                                     autoplay={isActive}
                                                     muted={isMuted}
@@ -320,7 +353,7 @@ export function TikTokCarousel({ videos }: TikTokCarouselProps) {
                                 );
                             })}
                         </motion.div>
-                    </motion.div>
+                    </div>
 
                     {/* Dots indicator */}
                     {videos.length > itemsPerView && (
@@ -372,7 +405,7 @@ const TikTokPlayerEmbed = forwardRef<HTMLIFrameElement, TikTokPlayerEmbedProps>(
                 <iframe
                     ref={ref}
                     src={playerUrl}
-                    className="w-full h-full border-0"
+                    className="w-full h-full border-0 pointer-events-none"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     title="TikTok Video"

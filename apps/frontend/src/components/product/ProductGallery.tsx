@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
@@ -21,10 +21,43 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         );
     }
 
+    const touchStartX = useRef(0);
+    const touchEndX = useRef(0);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+        touchEndX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        touchEndX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = () => {
+        const diff = touchStartX.current - touchEndX.current;
+        const threshold = 50;
+
+        if (Math.abs(diff) > threshold) {
+            if (diff > 0) {
+                // Swipe Left -> Next
+                setSelectedIndex((prev) => (prev + 1) % images.length);
+            } else {
+                // Swipe Right -> Prev
+                setSelectedIndex((prev) => (prev - 1 + images.length) % images.length);
+            }
+        }
+    };
+
     return (
         <div className="space-y-4">
             {/* Main Image */}
-            <div className="relative aspect-square bg-plume-cream rounded-2xl overflow-hidden">
+            <div
+                className="relative aspect-square bg-plume-cream rounded-2xl overflow-hidden touch-pan-y"
+                style={{ touchAction: 'pan-y' }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+            >
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={selectedIndex}

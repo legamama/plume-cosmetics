@@ -1,5 +1,7 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 
+export const revalidate = 60;
+
 // Section Components with Framer Motion animations
 import { HeroPrimary } from "@/components/sections/HeroPrimary";
 import { CategoryRow } from "@/components/sections/CategoryRow";
