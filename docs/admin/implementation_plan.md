@@ -94,6 +94,44 @@ Enable admins to manage URL redirects and publish them to Netlify.
 
 ---
 
+## Customer Feedback Management
+
+> [!NOTE]
+> **December 2024**: Replaced star ratings with admin-curated customer testimonials per product.
+
+### Goal
+Enable admins to manage customer feedback entries for each product. These appear on the frontend product detail page as "Cảm nhận từ khách hàng" (Customer Feedback).
+
+### Backend (`supabase`)
+- **Tables**:
+  - `product_feedbacks`: Main feedback records (image_url, author_name, author_context, sort_order, is_active)
+  - `product_feedback_translations`: Localized content (title, body, context) per locale
+
+### Admin UI (`apps/admin`)
+- **Component**: `src/components/forms/FeedbackEditor.tsx`
+  - Integrated into Product Editor page
+  - CRUD operations for feedback entries
+  - Locale tabs for vi/en/ko translations
+  - Image URL input (can use media library URL)
+  - Author name and context fields
+  - Active toggle
+  - Preview panel
+
+### Frontend Changes
+- **Removed**: Star rating display from `ProductInfo.tsx`
+- **Added**: `CustomerFeedback.tsx` component below product details
+- **SEO**: Feedback text rendered as crawlable HTML (not just images)
+
+### Data Flow
+1. **Load**: Admin opens Product Editor → `feedbackService.list(productId)`
+2. **Create**: Admin clicks "Add Feedback" → fills form → `feedbackService.create()`
+3. **Update**: Admin edits existing → `feedbackService.update()`
+4. **Delete**: Admin deletes with confirmation → `feedbackService.delete()`
+5. **Frontend**: Product page fetches feedbacks → renders in `CustomerFeedback` component
+
+---
+
+
 ## Plasmic Pages Management
 
 > [!IMPORTANT]

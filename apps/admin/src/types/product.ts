@@ -98,3 +98,54 @@ export const getEmptyProductFormData = (): ProductFormData => ({
     media: [],
     external_links: [],
 });
+
+// Product Feedback types
+export interface ProductFeedback {
+    id: string;
+    product_id: string;
+    image_url?: string;
+    author_name?: string;
+    author_context?: string;
+    sort_order: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ProductFeedbackTranslation {
+    id: string;
+    feedback_id: string;
+    locale: Locale;
+    title?: string;
+    body: string;
+    context?: string;
+}
+
+export interface ProductFeedbackWithTranslations extends ProductFeedback {
+    translations: ProductFeedbackTranslation[];
+}
+
+export interface FeedbackFormData {
+    id?: string;
+    image_url?: string;
+    author_name?: string;
+    author_context?: string;
+    sort_order: number;
+    is_active: boolean;
+    translations: {
+        vi: { title?: string; body: string; context?: string };
+        en?: { title?: string; body: string; context?: string };
+        ko?: { title?: string; body: string; context?: string };
+    };
+}
+
+export const getEmptyFeedbackFormData = (): FeedbackFormData => ({
+    image_url: '',
+    author_name: '',
+    author_context: '',
+    sort_order: 0,
+    is_active: true,
+    translations: {
+        vi: { title: '', body: '', context: '' },
+    },
+});

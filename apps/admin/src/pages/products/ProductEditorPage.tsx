@@ -18,6 +18,7 @@ import { MediaGalleryEditor } from '../../components/forms/MediaGalleryEditor';
 import { ExternalLinksEditor } from '../../components/forms/ExternalLinksEditor';
 import { LocaleTabPanel } from '../../components/forms/LocaleTabPanel';
 import { TagsInput } from '../../components/forms/TagsInput';
+import { FeedbackEditor } from '../../components/forms/FeedbackEditor';
 import type { ProductFormData, Locale, Status, SEOFields, MediaItem, ExternalLink } from '../../types';
 import { getEmptyProductFormData } from '../../types';
 
@@ -341,6 +342,11 @@ export function ProductEditorPage() {
                             value={formData.external_links as ExternalLink[]}
                             onChange={(external_links) => setFormData(prev => ({ ...prev, external_links }))}
                         />
+                    </Card>
+
+                    {/* Customer Feedbacks */}
+                    <Card>
+                        <FeedbackEditor productId={id} />
                     </Card>
                 </div>
 

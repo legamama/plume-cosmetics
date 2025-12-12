@@ -28,10 +28,13 @@ erDiagram
     PRODUCTS ||--o{ PRODUCT_TRANSLATIONS : has
     PRODUCTS ||--o{ PRODUCT_MEDIA : has
     PRODUCTS ||--o{ PRODUCT_EXTERNAL_LINKS : has
+    PRODUCTS ||--o{ PRODUCT_FEEDBACKS : has
+    PRODUCT_FEEDBACKS ||--o{ PRODUCT_FEEDBACK_TRANSLATIONS : has
     BLOG_POSTS ||--o{ BLOG_TRANSLATIONS : has
     BLOG_POSTS ||--o{ BLOG_MEDIA : has
     LOCALES ||--o{ PRODUCT_TRANSLATIONS : uses
     LOCALES ||--o{ BLOG_TRANSLATIONS : uses
+    LOCALES ||--o{ PRODUCT_FEEDBACK_TRANSLATIONS : uses
 ```
 
 ### Core Tables
@@ -44,6 +47,8 @@ erDiagram
 | `product_translations` | Locale-specific product content + SEO |
 | `product_media` | Product images/videos (Bunny CDN URLs) |
 | `product_external_links` | E-commerce platform links |
+| `product_feedbacks` | Admin-curated customer testimonials per product |
+| `product_feedback_translations` | Locale-specific feedback content |
 | `blog_posts` | Base blog post data |
 | `blog_translations` | Locale-specific blog content + SEO |
 | `blog_media` | Blog images/videos (Bunny CDN URLs) |
@@ -224,6 +229,58 @@ CREATE TABLE product_external_links (
 
 CREATE INDEX idx_external_links_product ON product_external_links(product_id);
 ```
+
+---
+
+### 6b. `product_feedbacks` - Customer Testimonials
+
+Admin-curated customer feedback/testimonials per product. These appear on product detail pages as social proof.
+
+```sql
+CREATE TABLE product_feedbacks (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id      UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    
+    -- Optional screenshot/image
+    image_url       TEXT,
+    
+    -- Meta info (non-translatable)
+    author_name     VARCHAR(100),           -- First name or initials
+    author_context  VARCHAR(200),           -- e.g. "sau 2 tuần sử dụng" (fallback)
+    
+    -- Ordering
+    sort_order      INTEGER DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_product_feedbacks_product ON product_feedbacks(product_id);
+CREATE INDEX idx_product_feedbacks_active ON product_feedbacks(product_id, is_active) WHERE is_active = TRUE;
+```
+
+### 6c. `product_feedback_translations` - Localized Feedback Content
+
+```sql
+CREATE TABLE product_feedback_translations (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    feedback_id     UUID NOT NULL REFERENCES product_feedbacks(id) ON DELETE CASCADE,
+    locale          VARCHAR(5) NOT NULL REFERENCES locales(code),
+    
+    -- Content
+    title           VARCHAR(200),           -- Short highlight/title
+    body            TEXT NOT NULL,          -- Main feedback text (crawlable for SEO)
+    context         VARCHAR(200),           -- Localized author context override
+    
+    UNIQUE(feedback_id, locale)
+);
+
+CREATE INDEX idx_product_feedback_trans_locale ON product_feedback_translations(feedback_id, locale);
+```
+
+> [!NOTE]
+> **SEO Strategy**: Feedback body text is rendered as regular HTML (not just images) so search engines can index customer testimonials as social proof for the product.
 
 ---
 
