@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Globe } from 'lucide-react';
-import { staticContentService, type StaticPage, type StaticPageTranslation } from '../../services/staticContentService';
+import { staticContentService, type StaticPage, type StaticPageContent } from '../../services/staticContentService';
 import { useToast } from '../../context/ToastContext';
 import { Button } from '../../components/ui/Button';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
@@ -18,8 +18,13 @@ export function StaticPageEditorPage() {
 
     const [page, setPage] = useState<StaticPage | null>(null);
     const [activeLocale, setActiveLocale] = useState<Locale>('vi');
-    const [translation, setTranslation] = useState<Partial<StaticPageTranslation>>({
-        content: {}
+
+    // Content State
+    const [content, setContent] = useState<StaticPageContent>({
+        seo_title: '',
+        seo_description: '',
+        seo_og_image_url: '',
+        slots: {}
     });
 
     const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +38,7 @@ export function StaticPageEditorPage() {
 
     useEffect(() => {
         if (id) {
-            loadTranslation(id, activeLocale);
+            loadContent(id, activeLocale);
         }
     }, [id, activeLocale]);
 
@@ -43,29 +48,16 @@ export function StaticPageEditorPage() {
             setPage(data);
         } catch (error) {
             console.error('Failed to load page:', error);
-            // navigate('/static-pages');
         }
     }
 
-    async function loadTranslation(pageId: string, locale: string) {
+    async function loadContent(pageId: string, locale: string) {
         setIsLoading(true);
         try {
-            const data = await staticContentService.getTranslation(pageId, locale);
-            if (data) {
-                setTranslation(data);
-            } else {
-                // Reset to empty state for new translation
-                setTranslation({
-                    page_id: pageId,
-                    locale,
-                    seo_title: '',
-                    seo_description: '',
-                    seo_og_image_url: '',
-                    content: {}
-                });
-            }
+            const data = await staticContentService.getPageContent(pageId, locale);
+            setContent(data);
         } catch (error) {
-            console.error('Failed to load translation:', error);
+            console.error('Failed to load content:', error);
         } finally {
             setIsLoading(false);
         }
@@ -78,32 +70,25 @@ export function StaticPageEditorPage() {
 
         setIsSaving(true);
         try {
-            await staticContentService.saveTranslation({
-                page_id: id,
-                locale: activeLocale,
-                seo_title: translation.seo_title || '',
-                seo_description: translation.seo_description || '',
-                seo_og_image_url: translation.seo_og_image_url || '',
-                content: translation.content || {}
-            });
+            await staticContentService.savePageContent(id, activeLocale, content);
             success('Saved successfully!');
         } catch (error: any) {
             console.error('Failed to save:', error);
-            // Enhanced error logging to understand the failure
-            console.error('Error details:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code
-            });
-            toastError(error.message || 'Failed to save changes.');
+            const msg = error.details || error.message || 'Failed to save changes.';
+            toastError(msg);
         } finally {
             setIsSaving(false);
         }
     }
 
-    const handleContentChange = (newContent: any) => {
-        setTranslation(prev => ({ ...prev, content: newContent }));
+    const handleSlotChange = (key: string, value: string) => {
+        setContent(prev => ({
+            ...prev,
+            slots: {
+                ...prev.slots,
+                [key]: value
+            }
+        }));
     };
 
     if (!page) return <LoadingSpinner />;
@@ -154,16 +139,14 @@ export function StaticPageEditorPage() {
                     <div className="lg:col-span-2 space-y-8">
                         {page.slug === 'home' && (
                             <HomePageForm
-                                content={translation.content}
-                                onChange={handleContentChange}
-                                locale={activeLocale}
+                                slots={content.slots}
+                                onChange={handleSlotChange}
                             />
                         )}
                         {page.slug === 'about' && (
                             <AboutPageForm
-                                content={translation.content}
-                                onChange={handleContentChange}
-                                locale={activeLocale}
+                                slots={content.slots}
+                                onChange={handleSlotChange}
                             />
                         )}
                     </div>
@@ -182,8 +165,8 @@ export function StaticPageEditorPage() {
                                     </label>
                                     <input
                                         type="text"
-                                        value={translation.seo_title || ''}
-                                        onChange={e => setTranslation(prev => ({ ...prev, seo_title: e.target.value }))}
+                                        value={content.seo_title}
+                                        onChange={e => setContent(prev => ({ ...prev, seo_title: e.target.value }))}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                         placeholder="Page Title"
                                     />
@@ -193,8 +176,8 @@ export function StaticPageEditorPage() {
                                         Meta Description
                                     </label>
                                     <textarea
-                                        value={translation.seo_description || ''}
-                                        onChange={e => setTranslation(prev => ({ ...prev, seo_description: e.target.value }))}
+                                        value={content.seo_description}
+                                        onChange={e => setContent(prev => ({ ...prev, seo_description: e.target.value }))}
                                         rows={4}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                         placeholder="Description for search engines..."
@@ -206,8 +189,8 @@ export function StaticPageEditorPage() {
                                     </label>
                                     <input
                                         type="text"
-                                        value={translation.seo_og_image_url || ''}
-                                        onChange={e => setTranslation(prev => ({ ...prev, seo_og_image_url: e.target.value }))}
+                                        value={content.seo_og_image_url}
+                                        onChange={e => setContent(prev => ({ ...prev, seo_og_image_url: e.target.value }))}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                         placeholder="https://..."
                                     />

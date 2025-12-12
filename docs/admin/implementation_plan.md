@@ -287,20 +287,23 @@ Enable admins to edit text and SEO content for hard-coded React pages (Home, Abo
 
 ### Backend (`supabase`)
 - **Table**: `static_pages` (id, slug, name)
-- **Table**: `static_page_translations` (id, page_id, locale, content: JSONB, seo_fields)
+- **Table**: `static_page_translations` (id, page_id, locale, seo_title, seo_description, seo_og_image_url) -> *Keeps SEO only*
+- **Table**: `static_page_slots` (id, page_id, locale, slot_key, content_value, rich_content) -> *New*
 
 ### Admin UI (`apps/admin`)
 - **List Page**: `/static-pages`
   - Lists "Landing Page" (/), "About Us" (/about)
 - **Editor**: `/static-pages/[id]`
   - Tabbed interface for Locales (VI, EN, KO)
-  - **Dynamic Forms**:
-    - `HomePageForm`: Hero, Categories, Best Sellers, Brand Story, Testimonials, FAQ, CTA.
-    - `AboutPageForm`: Hero, Mission, Origin, CTA.
-- **Service**: `staticContentService.ts` handles JSONB merging/updating.
+  - **Slot-Based Editor**:
+    - Fetches all slots for the page/locale.
+    - **Groups** slots by prefix (e.g., "Hero" group for `hero.title`, `hero.subtitle`).
+    - **Dynamic Inputs**: Text inputs for simple values, Rich Text for complex ones.
+    - **SEO Panel**: Separate panel for editing SEO fields from `static_page_translations`.
+- **Service**: `staticContentService.ts` refactored to handle `getStaticSlots` and `updateStaticSlot`.
 
 ### Data Flow
-1. **Load**: `staticContentService.getTranslation(pageId, locale)`
-2. **Edit**: Form updates local JSON state.
-3. **Save**: Upserts into `static_page_translations`.
+1. **Load**: `staticContentService.getStaticSlots(pageId, locale)` + `getSeo(pageId, locale)`
+2. **Edit**: Form updates local state for individual slots.
+3. **Save**: Upserts into `static_page_slots` and `static_page_translations`.
 

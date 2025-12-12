@@ -6,14 +6,11 @@ export interface StaticPage {
     name: string;
 }
 
-export interface StaticPageTranslation {
-    id?: string;
-    page_id: string;
-    locale: string;
+export interface StaticPageContent {
     seo_title: string;
     seo_description: string;
     seo_og_image_url: string;
-    content: any; // Using any for flexibility with JSONB
+    slots: Record<string, string>;
 }
 
 export const staticContentService = {
@@ -38,34 +35,69 @@ export const staticContentService = {
         return data as StaticPage;
     },
 
-    async getTranslation(pageId: string, locale: string) {
-        const { data, error } = await supabase
+    async getPageContent(pageId: string, locale: string): Promise<StaticPageContent> {
+        // Fetch SEO fields
+        const { data: translation } = await supabase
             .from('static_page_translations')
-            .select('*')
+            .select('seo_title, seo_description, seo_og_image_url')
             .eq('page_id', pageId)
             .eq('locale', locale)
             .maybeSingle();
 
-        if (error) throw error;
-        return data as StaticPageTranslation | null;
+        // Fetch Slots
+        const { data: slotsData } = await supabase
+            .from('static_page_slots')
+            .select('slot_key, content_value')
+            .eq('page_id', pageId)
+            .eq('locale', locale);
+
+        const slots: Record<string, string> = {};
+        if (slotsData) {
+            slotsData.forEach((s: any) => {
+                slots[s.slot_key] = s.content_value || '';
+            });
+        }
+
+        return {
+            seo_title: translation?.seo_title || '',
+            seo_description: translation?.seo_description || '',
+            seo_og_image_url: translation?.seo_og_image_url || '',
+            slots
+        };
     },
 
-    async saveTranslation(translation: Omit<StaticPageTranslation, 'updated_at' | 'created_at'>) {
-        // Upsert based on page_id and locale
-        const { data, error } = await supabase
+    async savePageContent(pageId: string, locale: string, content: StaticPageContent) {
+        // 1. Save SEO
+        const { error: seoError } = await supabase
             .from('static_page_translations')
             .upsert({
-                page_id: translation.page_id,
-                locale: translation.locale,
-                seo_title: translation.seo_title,
-                seo_description: translation.seo_description,
-                seo_og_image_url: translation.seo_og_image_url,
-                content: translation.content
-            }, { onConflict: 'page_id, locale' })
-            .select()
-            .single();
+                page_id: pageId,
+                locale: locale,
+                seo_title: content.seo_title,
+                seo_description: content.seo_description,
+                seo_og_image_url: content.seo_og_image_url
+            }, { onConflict: 'page_id, locale' });
 
-        if (error) throw error;
-        return data;
+        if (seoError) throw seoError;
+
+        // 2. Save Slots
+        // We only upsert the slots that are present in the map.
+        // Assuming we don't delete slots that are missing (unless we want to?)
+        // The prompt implies we just update values.
+
+        if (Object.keys(content.slots).length > 0) {
+            const slotsToUpsert = Object.entries(content.slots).map(([key, value]) => ({
+                page_id: pageId,
+                locale: locale,
+                slot_key: key,
+                content_value: value
+            }));
+
+            const { error: slotsError } = await supabase
+                .from('static_page_slots')
+                .upsert(slotsToUpsert, { onConflict: 'page_id, locale, slot_key' });
+
+            if (slotsError) throw slotsError;
+        }
     }
 };

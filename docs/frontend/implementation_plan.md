@@ -519,6 +519,70 @@ Hard-coded pages now fetch their text content from Supabase, allowing admin upda
   - `src/app/[locale]/page.tsx` (Home)
   - `src/app/[locale]/about/page.tsx` (About)
 
+
 ### SEO
-- `generateMetadata` functions now look up `seo_title`, `seo_description`, and `seo_og_image_url` from the database.
+- `generateMetadata` functions lookup SEO fields (stored in `static_page_translations` or similar) via stable keys.
+
+
+---
+
+## Slot-Based Content Model
+
+> [!IMPORTANT]
+> **December 2024**: Hard-coded static pages now use a **slot-based architecture** for content. This decouples content from layout, allowing future AI-driven design changes without breaking content editing.
+
+### Concept
+Each static page is treated as a layout with named **content slots**.
+- **Slots** are stable, dot-notation keys (e.g., `hero.title`, `usp.row1.body`).
+- Content is stored in Supabase keyed by `(page_slug, locale, slot_key)`.
+- Frontend maps slots to UI components.
+
+### Schema
+**`static_page_slots` Table:**
+- `page_id` (UUID)
+- `locale` (VARCHAR): `vi`, `en`, `ko`
+- `slot_key` (VARCHAR): Unique per page/locale.
+- `content_value` (TEXT): Simple text content.
+- `rich_content` (JSONB): Rich text or complex data (optional).
+
+### Slot Registry
+
+#### Home Page (`/`)
+| Section | Slot Key | Description |
+|---------|----------|-------------|
+| Hero | `hero.title` | Main headline |
+| | `hero.subtitle` | Subhead text |
+| | `hero.ctaLabel` | Button text |
+| | `hero.ctaLink` | Button URL |
+| Marquee | `marquee` | Rolling text |
+| Best Sellers | `bestSellers.title` | Section title |
+| | `bestSellers.subtitle` | Section subtitle |
+| Brand Story | `brandStory.heading` | Story headline |
+| | `brandStory.body` | Story text |
+| CTA Banner | `ctaBanner.heading` | Banner headline |
+| | `ctaBanner.subheading` | Banner subhead |
+| | `ctaBanner.button_label` | Button text |
+| | `ctaBanner.button_url` | Button URL |
+
+#### About Page (`/about`)
+| Section | Slot Key | Description |
+|---------|----------|-------------|
+| Hero | `hero.title` | Page title |
+| | `hero.subtitle` | Page subtitle |
+| Mission | `mission.heading` | Section heading |
+| | `mission.subtitle` | Small kicker |
+| | `mission.body` | Main text |
+| Origin | `origin.heading` | Section heading |
+| | `origin.subtitle` | Kicker |
+| | `origin.body` | Main text |
+| CTA Banner | `ctaBanner.heading` | Banner headline |
+| | `ctaBanner.subheading` | Banner subhead |
+| | `ctaBanner.button_label` | Button text |
+| | `ctaBanner.button_url` | Button URL |
+
+### Future-Proofing for AI
+When the AI refactors or redesigns a page:
+1. **Reuse existing slots** whenever possible (e.g., if moving the hero text, still bind to `hero.title`).
+2. **Define new slots** using the `section.element` naming convention for new content areas.
+3. **Register new slots** in the `static_page_slots` table so they appear in the Admin UI.
 

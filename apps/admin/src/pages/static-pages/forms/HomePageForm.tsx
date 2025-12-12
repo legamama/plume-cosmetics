@@ -1,27 +1,11 @@
-import { useState } from 'react';
+
 
 interface HomePageFormProps {
-    content: any;
-    onChange: (content: any) => void;
-    locale: string;
+    slots: Record<string, string>;
+    onChange: (key: string, value: string) => void;
 }
 
-export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
-    const handleChange = (section: string, field: string, value: any) => {
-        const newContent = { ...content };
-        if (!newContent[section]) newContent[section] = {};
-        newContent[section][field] = value;
-        onChange(newContent);
-    };
-
-    // Helper for nested updates
-    const handleNestedChange = (section: string, subSection: string, field: string, value: any) => {
-        const newContent = { ...content };
-        if (!newContent[section]) newContent[section] = {};
-        if (!newContent[section][subSection]) newContent[section][subSection] = {};
-        newContent[section][subSection][field] = value;
-        onChange(newContent);
-    };
+export function HomePageForm({ slots, onChange }: HomePageFormProps) {
 
     return (
         <div className="space-y-8">
@@ -33,16 +17,16 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
                         <input
                             type="text"
-                            value={content?.hero?.title || ''}
-                            onChange={(e) => handleChange('hero', 'title', e.target.value)}
+                            value={slots['hero.title'] || ''}
+                            onChange={(e) => onChange('hero.title', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
                         <textarea
-                            value={content?.hero?.subtitle || ''}
-                            onChange={(e) => handleChange('hero', 'subtitle', e.target.value)}
+                            value={slots['hero.subtitle'] || ''}
+                            onChange={(e) => onChange('hero.subtitle', e.target.value)}
                             rows={3}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         />
@@ -52,8 +36,8 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                             <label className="block text-sm font-medium text-gray-700 mb-1">CTA Label</label>
                             <input
                                 type="text"
-                                value={content?.hero?.ctaLabel || ''}
-                                onChange={(e) => handleChange('hero', 'ctaLabel', e.target.value)}
+                                value={slots['hero.ctaLabel'] || ''}
+                                onChange={(e) => onChange('hero.ctaLabel', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                             />
                         </div>
@@ -61,8 +45,8 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                             <label className="block text-sm font-medium text-gray-700 mb-1">CTA Link</label>
                             <input
                                 type="text"
-                                value={content?.hero?.ctaLink || ''}
-                                onChange={(e) => handleChange('hero', 'ctaLink', e.target.value)}
+                                value={slots['hero.ctaLink'] || ''}
+                                onChange={(e) => onChange('hero.ctaLink', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                             />
                         </div>
@@ -77,11 +61,8 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Running Text</label>
                     <input
                         type="text"
-                        value={content?.marquee || ''} // Marquee is top-level string in page.tsx usually, but we can store it in content object
-                        onChange={(e) => {
-                            const newContent = { ...content, marquee: e.target.value };
-                            onChange(newContent);
-                        }}
+                        value={slots['marquee'] || ''}
+                        onChange={(e) => onChange('marquee', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     />
                 </div>
@@ -95,8 +76,8 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
                         <input
                             type="text"
-                            value={content?.bestSellers?.title || ''}
-                            onChange={(e) => handleChange('bestSellers', 'title', e.target.value)}
+                            value={slots['bestSellers.title'] || ''}
+                            onChange={(e) => onChange('bestSellers.title', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
@@ -104,8 +85,8 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
                         <input
                             type="text"
-                            value={content?.bestSellers?.subtitle || ''}
-                            onChange={(e) => handleChange('bestSellers', 'subtitle', e.target.value)}
+                            value={slots['bestSellers.subtitle'] || ''}
+                            onChange={(e) => onChange('bestSellers.subtitle', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
@@ -121,16 +102,16 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Heading</label>
                         <input
                             type="text"
-                            value={content?.brandStory?.heading || ''}
-                            onChange={(e) => handleChange('brandStory', 'heading', e.target.value)}
+                            value={slots['brandStory.heading'] || ''}
+                            onChange={(e) => onChange('brandStory.heading', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Body</label>
                         <textarea
-                            value={content?.brandStory?.body || ''}
-                            onChange={(e) => handleChange('brandStory', 'body', e.target.value)}
+                            value={slots['brandStory.body'] || ''}
+                            onChange={(e) => onChange('brandStory.body', e.target.value)}
                             rows={4}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         />
@@ -146,8 +127,8 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Heading</label>
                         <input
                             type="text"
-                            value={content?.ctaBanner?.heading || ''}
-                            onChange={(e) => handleChange('ctaBanner', 'heading', e.target.value)}
+                            value={slots['ctaBanner.heading'] || ''}
+                            onChange={(e) => onChange('ctaBanner.heading', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
@@ -155,8 +136,8 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Subheading</label>
                         <input
                             type="text"
-                            value={content?.ctaBanner?.subheading || ''}
-                            onChange={(e) => handleChange('ctaBanner', 'subheading', e.target.value)}
+                            value={slots['ctaBanner.subheading'] || ''}
+                            onChange={(e) => onChange('ctaBanner.subheading', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         />
                     </div>
@@ -165,8 +146,8 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Button Label</label>
                             <input
                                 type="text"
-                                value={content?.ctaBanner?.button_label || ''}
-                                onChange={(e) => handleChange('ctaBanner', 'button_label', e.target.value)}
+                                value={slots['ctaBanner.button_label'] || ''}
+                                onChange={(e) => onChange('ctaBanner.button_label', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                             />
                         </div>
@@ -174,8 +155,8 @@ export function HomePageForm({ content, onChange, locale }: HomePageFormProps) {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Button URL</label>
                             <input
                                 type="text"
-                                value={content?.ctaBanner?.button_url || ''}
-                                onChange={(e) => handleChange('ctaBanner', 'button_url', e.target.value)}
+                                value={slots['ctaBanner.button_url'] || ''}
+                                onChange={(e) => onChange('ctaBanner.button_url', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                             />
                         </div>
