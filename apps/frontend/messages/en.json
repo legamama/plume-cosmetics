@@ -1,0 +1,173 @@
+{
+    "common": {
+        "brand": "Plumé Cosmetics",
+        "tagline": "Nurturing natural beauty with elegance and science",
+        "shopNow": "Shop Now",
+        "learnMore": "Learn More",
+        "viewAll": "View All",
+        "readMore": "Read More",
+        "backToHome": "Back to Home",
+        "loading": "Loading..."
+    },
+    "navigation": {
+        "home": "Home",
+        "products": "Products",
+        "about": "About",
+        "blog": "Blog"
+    },
+    "home": {
+        "hero": {
+            "title": "Radiant by nature, glowing with Plumé",
+            "subtitle": "Discover our skincare collection researched in Korea, safe for all skin types",
+            "cta": "Discover Now"
+        },
+        "launchOffer": {
+            "title": "Special Offer",
+            "description": "Receive exclusive gifts when you order during our launch week",
+            "cta": "Claim Offer"
+        },
+        "bestSellers": {
+            "title": "Best Sellers",
+            "subtitle": "Loved by thousands of customers"
+        },
+        "brandStory": {
+            "title": "About Plumé Cosmetics",
+            "subtitle": "Caring for your skin the way you care for yourself",
+            "description": "Plumé delivers safe and effective brightening skincare, combining cutting-edge Korean technology with gentle ingredients. Every product is rigorously tested to ensure optimal effectiveness and absolute safety.",
+            "feature1": {
+                "title": "Gentle Ingredients",
+                "description": "Mild and suitable even for sensitive skin"
+            },
+            "feature2": {
+                "title": "Korean Technology",
+                "description": "Effective skin restoration and brightening"
+            },
+            "feature3": {
+                "title": "International Standards",
+                "description": "Quality assured at every step"
+            }
+        },
+        "testimonials": {
+            "title": "What Our Customers Say",
+            "subtitle": "Genuine reviews from those who've experienced Plumé"
+        },
+        "faq": {
+            "title": "Frequently Asked Questions",
+            "subtitle": "Answers to all your questions",
+            "cta": "View All Questions"
+        },
+        "cta": {
+            "title": "Ready to start your beauty journey?",
+            "subtitle": "Discover Plumé's premium skincare collection today",
+            "button": "View Products"
+        },
+        "tiktok": {
+            "title": "Trending on TikTok",
+            "subtitle": "Discover our featured videos",
+            "handle": "@plumevietnam",
+            "prevSlide": "Previous videos",
+            "nextSlide": "Next videos",
+            "goToSlide": "Go to slide {number}"
+        }
+    },
+    "products": {
+        "title": "Our Products",
+        "subtitle": "Discover our skincare collection researched and produced in Korea",
+        "categories": {
+            "all": "All",
+            "serum": "Serum",
+            "cream": "Creams",
+            "sunscreen": "Sunscreen"
+        },
+        "card": {
+            "new": "New",
+            "bestSeller": "Best Seller",
+            "quickView": "Quick View"
+        }
+    },
+    "productDetail": {
+        "addToCart": "Add to Cart",
+        "buyNow": "Buy Now",
+        "buyOn": "Buy on {platform}",
+        "description": "Description",
+        "ingredients": "Ingredients",
+        "howToUse": "How to Use",
+        "benefits": "Benefits",
+        "reviews": "Reviews",
+        "relatedProducts": "Related Products",
+        "customerFeedback": "Customer Feedback",
+        "noFeedback": "No reviews yet"
+    },
+    "about": {
+        "hero": {
+            "title": "The Plumé Story",
+            "subtitle": "Bringing natural beauty to everyone"
+        },
+        "mission": {
+            "title": "Our Mission",
+            "description": "Plumé was founded with the desire to provide safe, effective, and science-backed beauty solutions. We believe everyone deserves healthy, radiant skin without compromising safety."
+        },
+        "values": {
+            "title": "Core Values",
+            "safety": {
+                "title": "Safety",
+                "description": "Carefully selected ingredients that cause no irritation"
+            },
+            "science": {
+                "title": "Science",
+                "description": "Clinically researched and proven formulas"
+            },
+            "quality": {
+                "title": "Quality",
+                "description": "Manufactured at Korea's leading facilities"
+            }
+        },
+        "origin": {
+            "title": "Product Origin",
+            "description": "All Plumé products are researched, developed, and manufactured at Korea's most reputable facilities, ensuring the strictest international quality standards."
+        }
+    },
+    "blog": {
+        "title": "Blog",
+        "subtitle": "Sharing beauty and skincare knowledge",
+        "categories": {
+            "all": "All",
+            "skincare": "Skincare",
+            "tips": "Beauty Tips",
+            "ingredients": "Ingredients"
+        },
+        "readTime": "{time} min read",
+        "publishedAt": "Published on {date}"
+    },
+    "footer": {
+        "description": "Nurturing natural beauty with elegance and science.",
+        "quickLinks": "Quick Links",
+        "contact": "Contact",
+        "followUs": "Follow Us",
+        "copyright": "© {year} Plumé Cosmetics. All rights reserved.",
+        "email": "hello@plumecosmetics.com"
+    },
+    "notFound": {
+        "title": "Page Not Found",
+        "description": "The page you're looking for doesn't exist or has been moved.",
+        "cta": "Back to Home"
+    },
+    "metadata": {
+        "home": {
+            "title": "Plumé Cosmetics - Safe Brightening Skincare from Korea",
+            "description": "Discover Plumé's premium cosmetics collection, researched and produced in Korea with gentle ingredients, safe for all skin types."
+        },
+        "products": {
+            "title": "Products - Plumé Cosmetics",
+            "description": "Explore Plumé skincare products: serums, creams, and sunscreens developed with Korean technology."
+        },
+        "about": {
+            "title": "About Us - Plumé Cosmetics",
+            "description": "Learn about Plumé Cosmetics' story and mission to deliver safe and effective beauty solutions."
+        },
+        "blog": {
+            "title": "Blog - Plumé Cosmetics",
+            "description": "Read articles about skincare, beauty tips, and cosmetic ingredient knowledge from Plumé Cosmetics."
+        }
+    }
+}

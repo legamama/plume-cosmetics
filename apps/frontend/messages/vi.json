@@ -1,0 +1,173 @@
+{
+    "common": {
+        "brand": "Plumé Cosmetics",
+        "tagline": "Nuôi dưỡng vẻ đẹp tự nhiên bằng sự tinh tế và khoa học",
+        "shopNow": "Mua ngay",
+        "learnMore": "Tìm hiểu thêm",
+        "viewAll": "Xem tất cả",
+        "readMore": "Đọc thêm",
+        "backToHome": "Về trang chủ",
+        "loading": "Đang tải..."
+    },
+    "navigation": {
+        "home": "Trang chủ",
+        "products": "Sản phẩm",
+        "about": "Về chúng tôi",
+        "blog": "Bài viết"
+    },
+    "home": {
+        "hero": {
+            "title": "Rạng rỡ tự nhiên, toả sáng cùng Plumé",
+            "subtitle": "Khám phá bộ sưu tập dưỡng da được nghiên cứu tại Hàn Quốc, an toàn cho mọi loại da",
+            "cta": "Khám phá ngay"
+        },
+        "launchOffer": {
+            "title": "Ưu đãi đặc biệt",
+            "description": "Nhận ngay quà tặng độc quyền khi đặt hàng trong tuần lễ ra mắt",
+            "cta": "Nhận ưu đãi"
+        },
+        "bestSellers": {
+            "title": "Sản phẩm bán chạy",
+            "subtitle": "Được yêu thích bởi hàng nghìn khách hàng"
+        },
+        "brandStory": {
+            "title": "Về Plumé Cosmetics",
+            "subtitle": "Chăm sóc làn da bạn như cách bạn yêu thương chính mình",
+            "description": "Plumé mang đến giải pháp dưỡng da trắng sáng an toàn, kết hợp công nghệ hiện đại từ Hàn Quốc với thành phần lành tính. Mỗi sản phẩm đều được kiểm định nghiêm ngặt để đảm bảo hiệu quả và an toàn tuyệt đối.",
+            "feature1": {
+                "title": "Thành phần lành tính",
+                "description": "Dịu nhẹ, phù hợp cả da nhạy cảm"
+            },
+            "feature2": {
+                "title": "Công nghệ Hàn Quốc",
+                "description": "Phục hồi và làm sáng da hiệu quả"
+            },
+            "feature3": {
+                "title": "Quy trình chuẩn quốc tế",
+                "description": "Đảm bảo chất lượng từng bước"
+            }
+        },
+        "testimonials": {
+            "title": "Khách hàng nói gì",
+            "subtitle": "Những chia sẻ chân thực từ người đã trải nghiệm"
+        },
+        "faq": {
+            "title": "Câu hỏi thường gặp",
+            "subtitle": "Giải đáp mọi thắc mắc của bạn",
+            "cta": "Xem tất cả câu hỏi"
+        },
+        "cta": {
+            "title": "Sẵn sàng bắt đầu hành trình làm đẹp?",
+            "subtitle": "Khám phá bộ sưu tập dưỡng da cao cấp của Plumé ngay hôm nay",
+            "button": "Xem sản phẩm"
+        },
+        "tiktok": {
+            "title": "Xu hướng trên TikTok",
+            "subtitle": "Khám phá các video nổi bật của chúng tôi",
+            "handle": "@plumevietnam",
+            "prevSlide": "Video trước",
+            "nextSlide": "Video tiếp theo",
+            "goToSlide": "Đi đến trang {number}"
+        }
+    },
+    "products": {
+        "title": "Sản phẩm của chúng tôi",
+        "subtitle": "Khám phá bộ sưu tập dưỡng da được nghiên cứu và sản xuất tại Hàn Quốc",
+        "categories": {
+            "all": "Tất cả",
+            "serum": "Serum",
+            "cream": "Kem dưỡng",
+            "sunscreen": "Chống nắng"
+        },
+        "card": {
+            "new": "Mới",
+            "bestSeller": "Bán chạy",
+            "quickView": "Xem nhanh"
+        }
+    },
+    "productDetail": {
+        "addToCart": "Thêm vào giỏ",
+        "buyNow": "Mua ngay",
+        "buyOn": "Mua trên {platform}",
+        "description": "Mô tả",
+        "ingredients": "Thành phần",
+        "howToUse": "Hướng dẫn sử dụng",
+        "benefits": "Công dụng",
+        "reviews": "Đánh giá",
+        "relatedProducts": "Sản phẩm liên quan",
+        "customerFeedback": "Cảm nhận từ khách hàng",
+        "noFeedback": "Chưa có đánh giá nào"
+    },
+    "about": {
+        "hero": {
+            "title": "Câu chuyện của Plumé",
+            "subtitle": "Hành trình mang làn đẹp tự nhiên đến mọi người"
+        },
+        "mission": {
+            "title": "Sứ mệnh của chúng tôi",
+            "description": "Plumé ra đời với mong muốn mang đến giải pháp làm đẹp an toàn, hiệu quả và có cơ sở khoa học. Chúng tôi tin rằng mọi người đều xứng đáng có làn da khoẻ mạnh, rạng rỡ mà không cần đánh đổi sự an toàn."
+        },
+        "values": {
+            "title": "Giá trị cốt lõi",
+            "safety": {
+                "title": "An toàn",
+                "description": "Thành phần được chọn lọc kỹ lưỡng, không gây kích ứng"
+            },
+            "science": {
+                "title": "Khoa học",
+                "description": "Công thức được nghiên cứu và kiểm chứng lâm sàng"
+            },
+            "quality": {
+                "title": "Chất lượng",
+                "description": "Sản xuất tại nhà máy hàng đầu Hàn Quốc"
+            }
+        },
+        "origin": {
+            "title": "Nguồn gốc sản phẩm",
+            "description": "Tất cả sản phẩm Plumé đều được nghiên cứu phát triển và sản xuất tại các nhà máy uy tín hàng đầu Hàn Quốc, đảm bảo tiêu chuẩn chất lượng quốc tế nghiêm ngặt nhất."
+        }
+    },
+    "blog": {
+        "title": "Bài viết",
+        "subtitle": "Chia sẻ kiến thức làm đẹp và chăm sóc da",
+        "categories": {
+            "all": "Tất cả",
+            "skincare": "Chăm sóc da",
+            "tips": "Mẹo làm đẹp",
+            "ingredients": "Thành phần"
+        },
+        "readTime": "{time} phút đọc",
+        "publishedAt": "Đăng ngày {date}"
+    },
+    "footer": {
+        "description": "Nuôi dưỡng vẻ đẹp tự nhiên bằng sự tinh tế và khoa học.",
+        "quickLinks": "Liên kết nhanh",
+        "contact": "Liên hệ",
+        "followUs": "Theo dõi chúng tôi",
+        "copyright": "© {year} Plumé Cosmetics. Bảo lưu mọi quyền.",
+        "email": "hello@plumecosmetics.com"
+    },
+    "notFound": {
+        "title": "Không tìm thấy trang",
+        "description": "Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển.",
+        "cta": "Về trang chủ"
+    },
+    "metadata": {
+        "home": {
+            "title": "Plumé Cosmetics - Dưỡng da trắng sáng an toàn từ Hàn Quốc",
+            "description": "Khám phá bộ sưu tập mỹ phẩm cao cấp Plumé, được nghiên cứu và sản xuất tại Hàn Quốc với thành phần lành tính, an toàn cho mọi loại da."
+        },
+        "products": {
+            "title": "Sản phẩm - Plumé Cosmetics",
+            "description": "Khám phá các sản phẩm dưỡng da Plumé: serum, kem dưỡng, và chống nắng được phát triển với công nghệ Hàn Quốc."
+        },
+        "about": {
+            "title": "Về chúng tôi - Plumé Cosmetics",
+            "description": "Tìm hiểu về câu chuyện và sứ mệnh của Plumé Cosmetics trong việc mang đến giải pháp làm đẹp an toàn và hiệu quả."
+        },
+        "blog": {
+            "title": "Bài viết - Plumé Cosmetics",
+            "description": "Đọc các bài viết về chăm sóc da, mẹo làm đẹp và kiến thức về thành phần mỹ phẩm từ Plumé Cosmetics."
+        }
+    }
+}

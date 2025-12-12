@@ -1,0 +1,74 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirects for trailing slash normalization
+[[redirects]]
+  from = "/*/"
+  to = "/:splat"
+  status = 301
+  force = false
+
+# Headers for security and caching
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Plasmic Studio app host - allow iframe embedding
+[[headers]]
+  for = "/plasmic-host"
+  [headers.values]
+    X-Frame-Options = "ALLOWALL"
+    Content-Security-Policy = "frame-ancestors 'self' https://studio.plasmic.app"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache images
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+# Internationalization - automatic locale detection
+# Redirect to Korean for Korean-speaking visitors
+[[redirects]]
+  from = "/"
+  to = "/ko"
+  status = 302
+  force = false
+  conditions = {Language = ["ko"]}
+
+# Redirect to Vietnamese for Vietnamese-speaking visitors
+[[redirects]]
+  from = "/"
+  to = "/vi"
+  status = 302
+  force = false
+  conditions = {Language = ["vi"]}
+
+# Default to English
+[[redirects]]
+  from = "/"
+  to = "/en"
+  status = 302
+  force = false
+
