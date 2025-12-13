@@ -5,25 +5,36 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { Eye, EyeOff } from 'lucide-react';
 
 export function LoginPage() {
     const navigate = useNavigate();
-    const { signIn } = useAuth();
+    const { signIn, resetPassword } = useAuth();
+    const [view, setView] = useState<'login' | 'forgot-password'>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setSuccessMessage('');
         setIsLoading(true);
 
         try {
-            await signIn(email, password);
-            navigate('/');
-        } catch (err) {
-            setError('Invalid email or password');
+            if (view === 'login') {
+                await signIn(email, password);
+                navigate('/');
+            } else {
+                await resetPassword(email);
+                setSuccessMessage('Password reset link has been sent to your email.');
+                // Optional: switch back to login after delay or let them click "Back to login"
+            }
+        } catch (err: any) {
+            setError(err.message || 'An error occurred');
         } finally {
             setIsLoading(false);
         }
@@ -38,15 +49,23 @@ export function LoginPage() {
                         <span className="text-white font-bold text-2xl">P</span>
                     </div>
                     <h1 className="text-2xl font-semibold text-text-primary">Plumé Admin</h1>
-                    <p className="text-text-secondary mt-2">Sign in to manage your content</p>
+                    <p className="text-text-secondary mt-2">
+                        {view === 'login' ? 'Sign in to manage your content' : 'Reset your password'}
+                    </p>
                 </div>
 
-                {/* Login Form */}
+                {/* Login/Reset Form */}
                 <div className="bg-surface rounded-xl border border-border shadow-soft p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {error && (
                             <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm">
                                 {error}
+                            </div>
+                        )}
+
+                        {successMessage && (
+                            <div className="p-3 rounded-lg bg-green-50 text-green-600 text-sm">
+                                {successMessage}
                             </div>
                         )}
 
@@ -60,29 +79,70 @@ export function LoginPage() {
                             autoComplete="email"
                         />
 
-                        <Input
-                            label="Password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                            required
-                            autoComplete="current-password"
-                        />
+                        {view === 'login' && (
+                            <>
+                                <div>
+                                    <Input
+                                        label="Password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        required
+                                        autoComplete="current-password"
+                                        rightIcon={
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="focus:outline-none hover:text-text-primary transition-colors"
+                                            >
+                                                {showPassword ? (
+                                                    <EyeOff className="w-5 h-5" />
+                                                ) : (
+                                                    <Eye className="w-5 h-5" />
+                                                )}
+                                            </button>
+                                        }
+                                    />
+                                    <div className="flex justify-end mt-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setView('forgot-password');
+                                                setError('');
+                                                setSuccessMessage('');
+                                            }}
+                                            className="text-xs text-plume-coral hover:text-plume-rose transition-colors"
+                                        >
+                                            Forgot password?
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
 
                         <Button
                             type="submit"
                             className="w-full"
                             isLoading={isLoading}
                         >
-                            Sign In
+                            {view === 'login' ? 'Sign In' : 'Send Reset Link'}
                         </Button>
-                    </form>
 
-                    {/* Dev hint */}
-                    <div className="mt-6 p-3 rounded-lg bg-plume-rose/50 text-sm text-text-secondary">
-                        <strong>Development mode:</strong> Enter any email and password to sign in.
-                    </div>
+                        {view === 'forgot-password' && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setView('login');
+                                    setError('');
+                                    setSuccessMessage('');
+                                }}
+                                className="w-full text-sm text-text-secondary hover:text-text-primary transition-colors"
+                            >
+                                Back to Sign In
+                            </button>
+                        )}
+                    </form>
                 </div>
             </div>
         </div>

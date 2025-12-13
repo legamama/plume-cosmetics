@@ -10,6 +10,7 @@ interface AuthContextValue {
     isAuthenticated: boolean;
     signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -53,6 +54,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (error) throw error;
     };
 
+    const resetPassword = async (email: string) => {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/update-password`,
+        });
+        if (error) throw error;
+    };
+
     return (
         <AuthContext.Provider
             value={{
@@ -61,6 +69,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 isAuthenticated: !!user,
                 signIn,
                 signOut,
+                resetPassword,
             }}
         >
             {children}
